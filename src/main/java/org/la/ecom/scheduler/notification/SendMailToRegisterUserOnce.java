@@ -1,11 +1,13 @@
 package org.la.ecom.scheduler.notification;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.la.ecom.mysql.api.dto.AuthenticationRequestDTO;
 import org.la.ecom.mysql.api.dto.AuthenticationResponseDTO;
 import org.la.ecom.mysql.api.dto.MailFormatEmailListDTO;
+import org.la.ecom.mysql.api.dto.UserDTO;
 import org.la.ecom.scheduler.client.service.ApiServiceScheduler;
 import org.la.ecom.scheduler.template.interceptor.RestTemplateInterceptor;
 import org.slf4j.Logger;
@@ -33,7 +35,7 @@ public class SendMailToRegisterUserOnce {
 	
 	private final Logger log = LoggerFactory.getLogger(SendMailToRegisterUserOnce.class);
 			
-	@Scheduled(cron = "*/10 * * * * *")
+	@Scheduled(cron = "*/15 * * * * *")	//every 10 secondss
 	public void cronJobSch() {
 		
 		log.info("------------------------Java cron job expression::::::::::::::::::::::::::::: ");
@@ -52,7 +54,7 @@ public class SendMailToRegisterUserOnce {
 				
 				restTemplateInterceptor.setAuthorizationHeader(authorizationHeader);
 				
-				MailFormatEmailListDTO mailFormatEmailListDTO = apiServiceScheduler.mysqlClient().getForObject("/allMailsToSend/1", MailFormatEmailListDTO.class);
+				MailFormatEmailListDTO mailFormatEmailListDTO = apiServiceScheduler.mysqlClient().getForObject("/user/allMailsToSend/1", MailFormatEmailListDTO.class);
 				
 				if(mailFormatEmailListDTO!=null) {
 					
@@ -60,8 +62,12 @@ public class SendMailToRegisterUserOnce {
 					System.out.println("isMailSend: "+isMailSend);
 					
 					if(isMailSend) {
-						List<String> mailList = mailFormatEmailListDTO.getMailList();
-						apiServiceScheduler.mysqlClient().put("/updateMailSentStatusSent", mailList);
+						List<UserDTO> userList = mailFormatEmailListDTO.getUserList();
+						
+						List<String> mailList = new ArrayList<>();
+						
+						userList.stream().forEach(user -> mailList.add(user.getEmail()));
+						apiServiceScheduler.mysqlClient().put("/user/updateMailSentStatusSent", mailList);
 					}
 				}
 				
