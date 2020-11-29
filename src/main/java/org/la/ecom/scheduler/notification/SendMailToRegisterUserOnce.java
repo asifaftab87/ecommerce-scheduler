@@ -35,7 +35,7 @@ public class SendMailToRegisterUserOnce {
 	
 	private final Logger log = LoggerFactory.getLogger(SendMailToRegisterUserOnce.class);
 			
-	@Scheduled(cron = "*/15 * * * * *")	//every 10 secondss
+	@Scheduled(cron = "*/15 * * * * *")	//every 15 secondss
 	public void cronJobSch() {
 		
 		log.info("------------------------Java cron job expression::::::::::::::::::::::::::::: ");
